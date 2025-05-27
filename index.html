@@ -1,25 +1,21 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=no"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <style>
       html, body {
         margin: 0;
         padding: 0;
-        overflow: hidden;
         width: 100%;
         height: 100%;
+        overflow: hidden;
       }
-
       a-scene {
-        position: absolute;
         width: 100vw;
         height: 100vh;
+        position: absolute;
         top: 0;
         left: 0;
       }
@@ -34,13 +30,7 @@
       device-orientation-permission-ui="enabled: false"
     >
       <a-assets>
-        <video
-          id="video"
-          src="VID-20250525-WA0000.mp4"
-          preload="auto"
-          playsinline
-          crossorigin="anonymous"
-        ></video>
+        <video id="video" src="VID-20250525-WA0000.mp4" preload="auto" playsinline crossorigin="anonymous"></video>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -50,6 +40,8 @@
           id="video-plane"
           src="#video"
           position="0 0 0"
+          width="1.2"
+          height="0.54"
           rotation="0 0 0"
         ></a-video>
       </a-entity>
@@ -59,22 +51,27 @@
       const video = document.querySelector("#video");
       const videoPlane = document.querySelector("#video-plane");
 
+      function fixRotation() {
+        // Força a rotação correta, útil se estiver virando errado em paisagem
+        videoPlane.setAttribute("rotation", "0 0 0");
+      }
+
       function setResponsiveVideoSize() {
-        const aspectRatio = 2.22; // largura / altura do vídeo
+        const aspectRatio = 2400 / 1080; // Largura / Altura
         const orientation = window.innerWidth > window.innerHeight ? "landscape" : "portrait";
 
         let width, height;
 
         if (orientation === "landscape") {
           width = 1.2;
-          height = width / aspectRatio;
         } else {
-          width = 0.8;
-          height = width / aspectRatio;
+          width = 0.9;
         }
+        height = width / aspectRatio;
 
         videoPlane.setAttribute("width", width);
         videoPlane.setAttribute("height", height);
+        fixRotation();
       }
 
       document.addEventListener("DOMContentLoaded", () => {
@@ -92,12 +89,12 @@
           video.currentTime = 0;
         });
 
-        window.addEventListener("orientationchange", () => {
-          setTimeout(setResponsiveVideoSize, 300); // aguarda a rotação se ajustar
-        });
-
         window.addEventListener("resize", () => {
           setResponsiveVideoSize();
+        });
+
+        window.addEventListener("orientationchange", () => {
+          setTimeout(setResponsiveVideoSize, 300);
         });
       });
     </script>
