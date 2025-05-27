@@ -3,13 +3,12 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
     />
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <style>
-      html,
-      body {
+      html, body {
         margin: 0;
         padding: 0;
         overflow: hidden;
@@ -37,9 +36,10 @@
       <a-assets>
         <video
           id="video"
+          src="VID-20250525-WA0000.mp4"
+          preload="auto"
           playsinline
           crossorigin="anonymous"
-          src="VID-20250525-WA0000.mp4"
         ></video>
       </a-assets>
 
@@ -49,8 +49,6 @@
         <a-video
           id="video-plane"
           src="#video"
-          width="1"
-          height="0.45"
           position="0 0 0"
           rotation="0 0 0"
         ></a-video>
@@ -58,25 +56,48 @@
     </a-scene>
 
     <script>
+      const video = document.querySelector("#video");
+      const videoPlane = document.querySelector("#video-plane");
+
+      function setResponsiveVideoSize() {
+        const aspectRatio = 2.22; // largura / altura do vídeo
+        const orientation = window.innerWidth > window.innerHeight ? "landscape" : "portrait";
+
+        let width, height;
+
+        if (orientation === "landscape") {
+          width = 1.2;
+          height = width / aspectRatio;
+        } else {
+          width = 0.8;
+          height = width / aspectRatio;
+        }
+
+        videoPlane.setAttribute("width", width);
+        videoPlane.setAttribute("height", height);
+      }
+
       document.addEventListener("DOMContentLoaded", () => {
-        const video = document.querySelector("#video");
+        setResponsiveVideoSize();
+
         const sceneEl = document.querySelector("a-scene");
 
         sceneEl.addEventListener("targetFound", () => {
-          if (video.readyState >= 2) {
-            video.currentTime = 0;
-            video.play();
-          } else {
-            video.addEventListener("canplay", () => {
-              video.currentTime = 0;
-              video.play();
-            }, { once: true });
-          }
+          video.currentTime = 0;
+          video.play();
         });
 
         sceneEl.addEventListener("targetLost", () => {
           video.pause();
           video.currentTime = 0;
+        });
+
+        window.addEventListener("orientationchange", () => {
+          setTimeout(setResponsiveVideoSize, 300); // aguarda a rotação se ajustar
+        });
+
+        window.addEventListener("resize", () => {
+          setResponsiveVideoSize();
         });
       });
     </script>
